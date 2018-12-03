@@ -1,0 +1,273 @@
+%==================================================
+%      PREAMBOLO e DICHIARAZIONI INIZIALI
+%==================================================
+\documentclass[10pt,oneside,a4paper]{article}
+
+\usepackage[latin1]{inputenc} 
+\usepackage[italian]{babel}
+\usepackage[T1]{fontenc}
+\usepackage{siunitx} %Inserisce automaticamente i dati con le unità  di misura correttamente formattate del SI (utilizzo: \SI{0.82}{m^2}, in generale \SI{misura con il punto decimale}{unità  di misura})
+\sisetup{output-decimal-marker = {.}, separate-uncertainty = true, input-uncertainty-signs = \pm, detect-weight=true, detect-family=true} %per usare SI con il punto decimale
+\usepackage{listings} %Per citare codice informatico formattandolo correttamente
+\usepackage{amsmath,amsthm,verbatim,amssymb,amsfonts,amscd,graphicx,mathtools}
+\usepackage[makeroom]{cancel}
+\newcommand{\abs}[1]{\left\lvert\,#1\,\right\rvert}
+\usepackage{geometry}
+\usepackage{epigraph}
+\usepackage{booktabs}	%tabelle migliorate
+\usepackage{tablefootnote}	%note a piè di pagina in tabella
+\usepackage{threeparttable} %tabella con note a piè di tabella
+\usepackage{caption}	%descrizione per figure
+\usepackage{dblfnote}
+\captionsetup{tableposition=top,figureposition=bottom,font=small} %setup descrizione
+\usepackage{float}
+\usepackage{esvect} %vettori
+\usepackage{longtable} %tabelle lunghe
+\usepackage[dvipsnames]{xcolor}
+\definecolor{sepia}{HTML}{80002A}
+\usepackage[colorlinks=true, citecolor=black, linkcolor=sepia, urlcolor=black]{hyperref}
+\usepackage{mathrsfs}
+\usepackage{circuitikz}
+\tikzset{
+  font={\fontsize{7pt}{12}\selectfont}}
+\ctikzset{bipoles/resistor/height=0.2}
+\ctikzset{bipoles/resistor/width=0.4}
+\ctikzset{tripoles/american nand port/height=0.7}
+\ctikzset{tripoles/american nand port/width=0.8}
+\usepackage{enumitem} %Liste senza spazi verticali
+\setlist{noitemsep}
+\usepackage{amsmath}
+
+
+\interfootnotelinepenalty=10000
+
+
+\usepackage{multicol}
+\newenvironment{Figure}
+  {\par\medskip\noindent\minipage{\linewidth}}
+  {\endminipage\par\medskip}
+
+\newcommand{\var}{\operatorname{var}}
+\newcommand{\cov}{\operatorname{cov}}
+
+
+\usepackage{listings} %Per inserire codice
+\lstnewenvironment{codice_c}[1][]
+{\lstset{basicstyle=\small\ttfamily, columns=fullflexible,
+keywordstyle=\color{red}\bfseries, commentstyle=\color{blue},
+language=C, basicstyle=\small,
+numbers=left, numberstyle=\tiny,
+stepnumber=2, numbersep=5pt, frame=shadowbox,  showstringspaces=false, #1}}{}
+
+%==================================================
+%                  PRIMA PAGINA
+%==================================================
+
+\title{\textsc{\textbf{Esercitazione 7}: Costruzione di un ADC}}
+\author{\small{G. Galbato Muscio} \and \small{L. Gravina} \and \small{L. Graziotto}}
+\date{4 Dicembre 2018}
+
+\begin{document}
+	\begin{figure}
+		\centering
+		\includegraphics[scale=0.5, trim={2.8cm 8.9cm 0 9cm}, clip]{logo.png}
+	\end{figure}
+	\maketitle
+	\begin{center} 
+		\fbox{{\fontsize{12pt}{8mm}\textsc{Gruppo 11}}} \\
+	\end{center}
+\hrule
+\vspace{0.5cm}
+\renewcommand{\abstractname}{Abstract}
+\begin{abstract}
+Si realizza un \emph{analog to digital converter}, utilizzando un contatore a 4 bit realizzato con l'integrato 7493 e costruendo un DAC a pesiera a 4 ingressi e un comparatore, con l'amplificatore operazionale LM358, e un adattatore di livello logico, con l'integrato 74LS00.
+\end{abstract}
+\vspace{4cm}
+\tableofcontents %Indice
+\newpage
+
+
+\pagebreak
+
+
+\begin{multicols}{2}
+%==================================================
+%             INTRODUZIONE
+%==================================================
+\section{Introduzione}
+\begin{figure*}[t]
+\caption{Circuito completo dell'ADC}
+\label{fig:complete_circuit}
+\centering
+\includegraphics[width=0.7\linewidth]{completo}
+\end{figure*}
+
+
+
+Si realizza un convertitore analogico-digitale (ADC) a 4 bit, ossia un dispositivo che converte una tensione di ingresso $V_x$ in un numero binario a 4 bit ad essa proporzionale. Si riporta in Figura~\ref{fig:complete_circuit} il circuito completo, nel quale è possibile distinguere un contatore a 4 bit (realizzato con l'integrato 7493), un comparatore d'ingresso realizzato con un op-amp, attraverso il quale verrà fornita al circuito la tensione $V_x$, un convertitore digitale-analogico (DAC) a pesiera a 4 ingressi e un adattatore di livello logico.
+
+La tensione da convertire, $V_x$, sarà negativa e tale che
+\[
+\SI{- 5}{V} \leq V_x \leq 0
+\]
+ed è ottenuta mediante un partitore costruito con un trimmer, collegato alla tensione di \SI{-15}{V} erogata dal generatore. 
+
+%==================================================
+%             CONTATORE A 4 BIT
+%==================================================
+\section{Contatore a 4 bit}\label{sec:counter}
+Si realizza un contatore a 4 bit utilizzando l'integrato 7493; si riporta in Figura~\ref{fig:counter} il circuito corrispondente. Il componente è alimentato con una tensione continua di \SI{5}{V} erogata da uno dei due generatori, e si collegano entrambi gli ingressi di \texttt{RESET}, mediante un interruttore, alternativamente a massa o a \SI{5}{V}, per azzerare manualmente il contatore. 
+
+\begin{Figure}
+\captionof{figure}{Contatore a 4 bit}
+\label{fig:counter}
+\centering
+\includegraphics[width=\linewidth]{contatore}
+\end{Figure}
+
+Si connette inoltre il pin \texttt{1} al pin \texttt{12} in modo da fornire al secondo flip-flop interno all'integrato il segnale in uscita dal primo flip-flop come ingresso di clock.
+
+Alle uscite vengono collegati, protetti da resistenze dell'ordine dei \SI{500}{\ohm}, dei led, al fine di verificare il corretto funzionamento del dispositivo. Essi sono infatti ordinati dall'output relativo al bit più significativo a quello relativo al bit meno significativo, e la loro progressiva e ordinata accensione sarà indice di funzionamento. Si invia dunque all'ingresso di \texttt{CLOCK} un'onda quadra TTL con frequenza di \SI{111 \pm 111}{Hz} e ampiezza variabile tra \SI{0}{} e \SI{111}{V}\footnote{Come nella precedente esperienza, si osserva che il generatore di segnali non genera un'onda TTL tra $0$ e \SI{5}{V}, bensì oscillante tra i valori indicati.}, mediante il generatore di segnali.
+
+Si osserva che, come previsto, i LED si accendono in successione per formare la sequenza di numeri da $0$ a $15$. Le resistenze usate a protezione dei LED, misurate con il multimetro, sono:
+\begin{itemize} %Lo spazio verticale è stato tolto con \setlist{noitemsep} nell'header, rimuovere quella riga per avere una lista classica
+	\item[--] $R_1 = \SI{111 \pm 111}{\ohm}$;
+	\item[--] $R_2 = \SI{111 \pm 111}{\ohm}$;
+	\item[--] $R_3 = \SI{111 \pm 111}{\ohm}$;
+	\item[--] $R_4 = \SI{111 \pm 111}{\ohm}$.
+\end{itemize}
+
+Si misurano inoltre i livelli di tensione in uscita al contatore mediante il multimetro: si resetta il contatore a 0000 e quindi, mediante un clock manuale, lo si porta a 1111. Si riportano in Tabella~\ref{tab:counter} le misure di tensione per i livelli logici alto e basso per i quattro output.
+
+\begin{center}
+\captionof{table}{Misure di tensione sul contatore}
+\label{tab:counter}
+\begin{tabular}{c|c|c}
+Output & $V$ a 0 logico [\SI{}{V}] & $V$ a 1 logico [\SI{}{V}] \\
+\hline
+      $Q_0$ &        111 &         111  \\
+      $Q_1$ &        111 &         111  \\
+      $Q_2$ &        111 &         111  \\
+      $Q_3$ &        111 &         111  \\
+\hline
+\end{tabular}
+\end{center}
+
+%==================================================
+%             DAC A 4 BIT
+%==================================================
+\section{DAC a 4 bit}
+Si costruisce un convertitore digitale-analogico (DAC) invertente a pesiera, utilizzando l'amplificatore operazionale LM358, alimentato con tensione di $\pm \SI{15}{V}$, erogata dal generatore. Si scelgono le resistenze in modo da avere un'uscita compresa nella massima dinamica possibile per l'operazionale, ricordando che in ingresso si fornirà un livello logico TTL, che, da quanto visto nella sezione precedente, avrà come valore di tensione corrispondente a 0 logico \SI{111}{V}, e tensione corrispondente a 1 logico al massimo \SI{111}{V}. Inoltre i valori delle resistenze saranno scelti dell'ordine del \SI{}{\kilo\ohm}, in modo da evitare eccessi di corrente. 
+
+Si riporta in Figura~\ref{fig:dac} il circuito realizzato.
+
+\begin{Figure}
+\captionof{figure}{Convertitore digitale-analogico}
+\label{fig:dac}
+\centering
+\includegraphics[width=\linewidth]{dac}
+\end{Figure}
+
+Per compiere la regolazione della rete più precisa possibile, si sceglie di utilizzare un resistore fisso in corrispondenza di $R_1$, e di utilizzare dei trimmer in luogo di $R_2$, $R_3$ e $R_4$, tali da soddisfare le seguenti relazioni
+\[
+\begin{aligned}
+R_2 &= 2 R_1; \\
+R_3 &= 4 R_1; \\
+R_4 &= 8 R_1.
+\end{aligned}
+\] 
+Ricordando che in questo caso la risposta dell'op-amp è
+\[
+V_o = -\frac{R'}{8R}\big[V(Q_0) + 2V(Q_1) + 4V(Q_2) + 8V(Q_3)\big],
+\]
+e che si ha, per quanto visto prima, al massimo $V(Q_i) = \SI{111}{V} \equiv V_\text{in}^\text{max}$, si ottiene la relazione
+\[
+V_o = -\frac{R'}{8R} \cdot 15 \cdot V_\text{in}^\text{max},
+\] 
+che invertita pone una condizione sui valori di $R'$ ed $R$ (e conseguentemente sui valori impostati sui trimmer), poiché la tensione di uscita massima dev'essere minore di \SI{15}{V}, in modo da rimanere entro la dinamica dell'amplificatore invertente:
+\[
+\frac{R'}{R} < \frac{8}{V_\text{in}^\text{max}} = \frac{8}{111} = 111.
+\]
+Pertanto si scelgono per le resistenze i valori seguenti, misurati con il multimetro:
+
+\begin{itemize} %Lo spazio verticale è stato tolto con \setlist{noitemsep} nell'header, rimuovere quella riga per avere una lista classica
+	\item[--] $R_1 = \SI{111 \pm 111}{\ohm}$;
+	\item[--] $R_2 = \SI{111 \pm 111}{\ohm}$;
+	\item[--] $R_3 = \SI{111 \pm 111}{\ohm}$;
+	\item[--] $R_4 = \SI{111 \pm 111}{\ohm}$;
+	\item[--] $R' = \SI{111 \pm 111}{\ohm}$.
+\end{itemize}
+
+Si verifica quindi che il circuito si comporti correttamente come un sommatore invertente, osservando l'uscita al canale \texttt{CH2} dell'oscilloscopio e fornendo manualmente tensioni di \SI{111}{V} agli ingressi, con un partitore di tensione.
+
+Si collegano quindi agli ingressi del DAC le uscite del contatore realizzato nella Sezione~\ref{sec:counter}; quindi si fornisce al contatore un clock mediante un'onda quadra TTL di frequenza \SI{111}{Hz}, e ampiezza variabile tra i valori già discussi precedentemente. Si riporta in Figura~\ref{fig:verifica_tensione_dac} un'istantanea dell'oscilloscopio per questa configurazione: al canale \texttt{CH1} vi è l'onda quadra di clock, mentre al \texttt{CH2} l'uscita del DAC. Si osserva come essa sia decrescente, in quanto l'amplificatore è invertente, e presenti un andamento della tensione \emph{a gradini}.
+
+%\begin{Figure}
+%	\begin{center}
+%	\includegraphics[width=\linewidth]{}
+%	\captionof{figure}{Istantanea dell'oscilloscopio per la tensione di uscita del DAC}
+%	\label{fig:verifica_tensione_dac}
+%	\end{center}
+%\end{Figure}
+
+Per misurare l'altezza di tali \emph{gradini}, si procede impostando manualmente il clock, e facendo avanzare il conteggio da 0 a 15; si misurano quindi con il multimetro i valori della tensione in output all'op-amp. Si riportano in Tabella~\ref{tab:verifica_dac} i punti sperimentali trovati, e la stima dell'altezza di ciascun gradino come differenza del valore misurato con quello precedente.
+
+\begin{center}
+\captionof{table}{Misure sul circuito DAC}
+\label{tab:verifica_dac}
+\begin{tabular}{c|c|c}
+Contatore & $V_\text{out}$ [\SI{}{V}] & $\Delta V_\text{out}$ [\SI{}{mV}] \\
+\hline
+      0 &        111 &         111  \\
+      1 & 		111 &         111  \\
+\hline
+\end{tabular}
+\end{center}
+
+Si riporta inoltre in Figura~\ref{fig:tensione_DAC} l'andamento della tensione in uscita dal DAC in funzione del numero dato dal contatore. Si osserva che essa ha pendenza negativa di \SI{111}{V}, come previsto dalla modalità invertente, e che al numero $15$ corrisponde un'uscita di \SI{-15}{V}, a conferma della copertura con la massima sensibilità dell'intero range a disposizione dell'amplificatore. Inoltre, la linearità dell'andamento è confermata dalla stima del chi-quadro $111$, contro un numero di gradi di libertà di $14$.
+
+%\begin{Figure}
+%	\begin{center}
+%	\includegraphics[width=\linewidth]{}
+%	\captionof{figure}{Tensione in uscita al DAC in funzione del numero in ingresso}
+%	\label{fig:tensione_DAC}
+%	\end{center}
+%\end{Figure}
+
+
+
+
+\end{multicols}
+\newpage
+\section{Appendice}
+
+
+%ESEMPIO DI FIGURA
+%\begin{Figure}
+%	\begin{center}
+%	\includegraphics[width=\linewidth]{comune.png}
+%	\captionof{figure}{Istantanea dell'oscilloscopio per l'amplificatore differenziale, misura di $A_c$}
+%	\label{fig:Ac_differenziale}
+%	\end{center}
+%\end{Figure}
+
+
+%ESEMPIO DI TABELLA
+%\begin{center}
+%\captionof{table}{Misure per la stima di $A_c$}
+%\label{tab:Ac_differenziale}
+%\begin{tabular}{c|c|c|c}
+%$f$ [\SI{}{Hz}] & $V_i$ [\SI{}{V}] & $v_o$ [\SI{}{mV}] & $A_c = v_o / V_i$ \\
+%\hline
+%      149.5 &        3.90 &         11.3 & 2.90e-03 \\
+%      222.0 &        3.90 &         11.5 & 2.95e-03 \\
+%      281.0 &        3.90 &         11.8 & 3.03e-03 \\
+%      359.0 &        3.90 &         11.8 & 3.03e-03 \\
+%      461.0 &        3.90 &         12.2 & 3.13e-03 \\
+%\hline
+%\end{tabular}
+%\end{center}
+
+
+
+\end{document}
