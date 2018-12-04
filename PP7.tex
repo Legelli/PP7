@@ -118,7 +118,7 @@ ed è ottenuta mediante un partitore costruito con un trimmer, collegato alla ten
 %             CONTATORE A 4 BIT
 %==================================================
 \section{Contatore a 4 bit}\label{sec:counter}
-Si realizza un contatore a 4 bit utilizzando l'integrato SN74LS93N; si riporta in Figura~\ref{fig:counter} il circuito corrispondente. Il componente è alimentato con una tensione continua di \SI{5}{V} erogata da uno dei due generatori, e si collegano entrambi gli ingressi di \texttt{RESET}, mediante un interruttore, alternativamente a massa o a \SI{5}{V}, per azzerare manualmente il contatore\footnote{Questo collegamento è visibile nella figura del circuito completo (Figura~\ref{fig:complete_circuit}), non nella Figura~\ref{fig:counter}.}. 
+Si realizza un contatore a 4 bit utilizzando l'integrato SN74LS93N; si riporta in Figura~\ref{fig:counter} il circuito corrispondente. Il componente è alimentato con una tensione continua di \SI{5}{V} erogata da uno dei due generatori, e si collegano entrambi gli ingressi di \texttt{RESET}, mediante un interruttore, alternativamente a massa o a \SI{5}{V}, per azzerare manualmente il contatore\footnote{Questo collegamento è visibile nella figura del circuito completo (Figura~\ref{fig:complete_circuit}), non nella Figura~\ref{fig:counter}.}. L'interruttore è realizzato collegando l'alimentatore a \SI{5}{V} agli ingressi di reset attraverso una resistenza di \emph{pull-up} dell'ordine del \SI{}{\kilo\ohm}, quindi per portare gli ingressi a livello logico basso li si collega direttamente a massa\footnote{La resistenza di pull-up serve ad evitare di cortocircuitare l'alimentatore.}.
 
 \begin{Figure}
 \captionof{figure}{Contatore a 4 bit}
@@ -129,39 +129,35 @@ Si realizza un contatore a 4 bit utilizzando l'integrato SN74LS93N; si riporta i
 
 Si connette inoltre il pin \texttt{1} al pin \texttt{12} in modo da fornire al secondo flip-flop interno all'integrato il segnale in uscita dal primo flip-flop come ingresso di clock. In questo modo, il contatore è effettivamente a 4 bit invece che a 3.
 
-Alle uscite vengono collegati, protetti da resistenze dell'ordine dei \SI{500}{\ohm}, dei led, al fine di verificare il corretto funzionamento del dispositivo. Essi sono infatti ordinati dall'output relativo al bit più significativo a quello relativo al bit meno significativo, e la loro progressiva e ordinata accensione sarà indice di funzionamento. Si invia dunque all'ingresso di \texttt{CLOCK} un'onda quadra TTL con frequenza di \SI{111 \pm 111}{Hz} e ampiezza variabile tra \SI{0}{} e \SI{111}{V}\footnote{Come nella precedente esperienza, si osserva che il generatore di segnali non genera un'onda TTL tra $0$ e \SI{5}{V}, bensì oscillante tra i valori indicati.}, mediante il generatore di segnali.
+Alle uscite vengono collegati, protetti da resistenze dell'ordine dei \SI{500}{\ohm}, dei led, al fine di verificare il corretto funzionamento del dispositivo. Essi sono infatti ordinati dall'output relativo al bit più significativo (corrispondente alla resistenza $R_4$) a quello relativo al bit meno significativo (corrispondente alla resistenza $R_1$), e la loro progressiva e ordinata accensione sarà indice di funzionamento. Si invia dunque all'ingresso di \texttt{CLOCK} un'onda quadra TTL con frequenza nell'ordine degli Hertz\footnote{Una frequenza così bassa è necessaria per poter apprezzare la sequenza di accensione dei led.} mediante il generatore di segnali: si osserva che, come previsto, i LED si accendono in successione per formare la sequenza di numeri da $0$ a $15$.
 
-Si osserva che, come previsto, i LED si accendono in successione per formare la sequenza di numeri da $0$ a $15$. Le resistenze usate a protezione dei LED, misurate con il multimetro, sono:
-\begin{itemize} %Lo spazio verticale è stato tolto con \setlist{noitemsep} nell'header, rimuovere quella riga per avere una lista classica
-	\item[--] $R_1 = \SI{111 \pm 111}{\ohm}$;
-	\item[--] $R_2 = \SI{111 \pm 111}{\ohm}$;
-	\item[--] $R_3 = \SI{111 \pm 111}{\ohm}$;
-	\item[--] $R_4 = \SI{111 \pm 111}{\ohm}$.
-\end{itemize}
+Empiricamente si è visto che risulta problematico produrre un segnale manuale di clock a causa della non idealità dell'interruttore: ad un singolo segnale manuale corrispondevano infatti molteplici segnali che raggiungevano il contatore.
 
-Si misurano inoltre i livelli di tensione in uscita al contatore mediante il multimetro: si resetta il contatore a 0000 e si misurano le tensioni delle uscite; quindi, mediante un clock manuale, lo si porta a 1111 e si ripete la misura. Si riportano in Tabella~\ref{tab:counter} le misure di tensione per i livelli logici alto e basso per i quattro output.
-%COMMENTARE!!
+Si misurano i livelli di tensione in uscita al contatore mediante il multimetro: si resetta il contatore a 0000 e si misurano le tensioni delle uscite; quindi, arrestando opportunamente l'onda quadra in ingresso di \texttt{CLOCK}, lo si porta a 1111 e si ripete la misura. Si riportano in Tabella~\ref{tab:counter} le misure di tensione per i livelli logici alto e basso per i quattro output. Si vede che i valori di tensione non corrispondono esattamente a quelli della logica TTL, sono invece compatibili con i valori riportati sul datasheet dell'integrato.
+
 
 \begin{center}
 \captionof{table}{Misure di tensione sul contatore}
 \label{tab:counter}
 \begin{tabular}{c|c|c}
 Output & $V$ a 0 logico [\SI{}{V}] & $V$ a 1 logico [\SI{}{V}] \\
- & $(\pm 111\%)$ & $(\pm 111\%)$\\ 
+ & $(\pm 0.5\%)$ & $(\pm 0.5\%)$\\ 
 \hline
-      $Q_0$ &        111 &         111  \\
-      $Q_1$ &        111 &         111  \\
-      $Q_2$ &        111 &         111  \\
-      $Q_3$ &        111 &         111  \\
+      $Q_0$ &        0.1281 &         3.22  \\
+      $Q_1$ &        0.1795 &         3.17  \\
+      $Q_2$ &        0.190 &         3.21  \\
+      $Q_3$ &        0.1432 &         3.33  \\
 \hline
 \end{tabular}
 \end{center}
+
+
 
 %==================================================
 %             DAC A 4 BIT
 %==================================================
 \section{DAC a 4 bit}
-Si costruisce un convertitore digitale-analogico (DAC) invertente a pesiera, utilizzando l'amplificatore operazionale LM358N, alimentato con tensione di $\pm \SI{15}{V}$, erogata dal generatore. Si scelgono le resistenze in modo da avere un'uscita compresa nella massima dinamica possibile per l'operazionale, ricordando che in ingresso si fornirà un livello logico TTL, che, da quanto visto nella sezione precedente, avrà come valore di tensione corrispondente a 0 logico \SI{111}{V}, e tensione corrispondente a 1 logico \SI{111}{V}, ottenuto dal valore medio per le quattro uscite. Inoltre i valori delle resistenze saranno scelti dell'ordine del \SI{}{\kilo\ohm}, in modo da evitare eccessi di corrente. 
+Si costruisce un convertitore digitale-analogico (DAC) invertente a pesiera, utilizzando l'amplificatore operazionale LM358N, alimentato con tensione di $\pm \SI{15}{V}$, erogata dal generatore. Si scelgono le resistenze in modo da avere un'uscita compresa nella massima dinamica possibile per l'operazionale, ricordando che in ingresso si fornirà un livello logico TTL, che, da quanto visto nella sezione precedente, avrà come valore di tensione corrispondente a 0 logico \SI{0.16 \pm 0.03}{V}, e tensione corrispondente a 1 logico \SI{3.23 \pm 0.06}{V}, ottenuti come valori medi delle quattro uscite. Inoltre i valori delle resistenze saranno scelti dell'ordine del \SI{}{\kilo\ohm}, in modo da evitare eccessi di corrente. 
 
 Si riporta in Figura~\ref{fig:dac} il circuito realizzato.
 
@@ -180,18 +176,27 @@ R_3 &= 4 R_1; \\
 R_4 &= 8 R_1.
 \end{aligned}
 \] 
-Ricordando che in questo caso la risposta dell'op-amp è
-\[
+Ricordando che nel caso ideale (a cui si vuole tendere) la risposta dell'op-amp è
+\begin{equation}
+\label{eq:VoutTeo}
 V_o = -\frac{R'}{8R}\big[V(Q_0) + 2V(Q_1) + 4V(Q_2) + 8V(Q_3)\big],
-\]
-e che si ha, per quanto visto prima, $V(Q_i) = \SI{3.23 \pm 0.06}{V} \equiv \overline{V}_\text{in}$, ottenuto dalla media sulle quattro uscite, si ottiene la relazione
-\[
-V_o = -\frac{R'}{8R} \cdot 15 \cdot \overline{V}_\text{in},
-\] 
+\end{equation}
+e che si ha, per quanto visto prima, $V(Q_i) = \SI{3.23 \pm 0.06}{V} \equiv \overline{V}_\text{in}$, si ottiene la relazione
+\begin{equation}
+\label{eq:Vout}
+V_\text{out} = -\frac{R'}{8R} \cdot 15 \cdot \overline{V}_\text{in},
+\end{equation}
 che invertita pone una condizione sui valori di $R'$ ed $R$ (e conseguentemente sui valori impostati sui trimmer), poiché la tensione di uscita massima dev'essere minore di \SI{15}{V}, in modo da rimanere entro la dinamica dell'amplificatore invertente:
-\[
+\begin{equation}
+\label{eq:R'}
 \frac{R'}{R} < \frac{8}{\overline{V}_\text{in}} = \frac{8}{3.23} = 2.48.
-\]
+\end{equation}
+
+%Per le ragioni che verranno discusse nel paragrafo successivo, la tensione massima che si vorrà avere in uscita dal DAC è $V_\text{out}^\text{max} = \SI{-5}{\volt}$, dunque dalla (\ref{eq:Vout}) si ricava il valore del rapporto di resistenze come
+%\[
+%	\frac{R'}{R} =  - \frac{8}{15} \cdot \frac{V_\text{out}^\text{max}}{\overline{V}_\text{in}} = 0.826.
+%\]
+Per $R'$ viene scelto provvisoriamente un valore inferiore al limite , ovvero $R' = 1.6 R$.
 Pertanto si scelgono per le resistenze i valori seguenti, misurati con il multimetro:
 
 \begin{itemize} %Lo spazio verticale è stato tolto con \setlist{noitemsep} nell'header, rimuovere quella riga per avere una lista classica
@@ -199,44 +204,86 @@ Pertanto si scelgono per le resistenze i valori seguenti, misurati con il multim
 	\item[--] $R_2 = \SI{2.01 \pm 0.01}{\kilo\ohm}$;
 	\item[--] $R_3 = \SI{4.00 \pm 0.02}{\kilo\ohm}$;
 	\item[--] $R_4 = \SI{8.04 \pm 0.04}{\kilo\ohm}$;
-	\item[--] $R' = \SI{111 \pm 111}{\kilo\ohm}$.
+	\item[--] $R' = \SI{1.62 \pm 0.04}{\kilo\ohm}$.
 \end{itemize}
 
-Si verifica quindi che il circuito si comporti correttamente come un sommatore invertente, osservando l'uscita al canale \texttt{CH2} dell'oscilloscopio e fornendo manualmente tensioni di \SI{111}{V} agli ingressi, con un partitore di tensione.
-
-Si collegano quindi agli ingressi del DAC le uscite del contatore realizzato nella Sezione~\ref{sec:counter}; quindi si fornisce al contatore un clock mediante un'onda quadra TTL di frequenza \SI{111}{Hz}, e ampiezza variabile tra i valori già discussi precedentemente. Si riporta in Figura~\ref{fig:verifica_tensione_dac} un'istantanea dell'oscilloscopio per questa configurazione: al canale \texttt{CH1} vi è l'onda quadra di clock, mentre al \texttt{CH2} l'uscita del DAC. Si osserva come essa sia decrescente, in quanto l'amplificatore è invertente, e presenti un andamento della tensione \emph{a gradini}.
-
-%\begin{Figure}
-%	\begin{center}
-%	\includegraphics[width=\linewidth]{}
-%	\captionof{figure}{Istantanea dell'oscilloscopio per la tensione di uscita del DAC}
-%	\label{fig:verifica_tensione_dac}
-%	\end{center}
-%\end{Figure}
-
-Per misurare l'altezza di tali \emph{gradini}, si procede impostando manualmente il clock, e facendo avanzare il conteggio da 0 a 15; si misurano quindi con il multimetro i valori della tensione in output all'op-amp. Si riportano in Tabella~\ref{tab:verifica_dac} i punti sperimentali trovati, e la stima dell'altezza di ciascun gradino come differenza del valore misurato con quello precedente.
+Si verifica quindi che il circuito si comporti correttamente come un DAC, impostando su di uno specifico ingresso una tensione di \SI{4.935 \pm 0.002}{V}, collegando gli altri a massa e misurando le tensioni in uscita: i valori sperimentali confrontati con i valori teorici ottenuti da (\ref{eq:VoutTeo}) sono riportati in Tabella \ref{tab:verifica_dac}, dove la prima colonna rappresenta la configurazione digitale corrispondente, indicata partendo dal bit più significativo.
 
 \begin{center}
-\captionof{table}{Misure sul circuito DAC}
+\captionof{table}{Misure sul DAC impostando manualmente gli ingressi}
 \label{tab:verifica_dac}
 \begin{tabular}{c|c|c}
-Contatore & $V_\text{out}$ [\SI{}{V}] & $\Delta V_\text{out}$ [\SI{}{mV}] \\
+Configurazione & $V_\text{out}$ [\SI{}{V}] & $V_\text{out}^\text{teo}$ [\SI{}{V}] \\
 \hline
-      0 &        111 &         111  \\
-      1 & 		111 &         111  \\
+      1000 &        \SI{-7.88 \pm 0.04}{} &         \SI{-7.99 \pm 0.08}{}  \\
+      0100 & 	\SI{-3.97 \pm 0.02}{} &         \SI{-4.00 \pm 0.04}{}  \\
+      0010 & 	\SI{-1.983 \pm 0.010}{} &         \SI{-2.00 \pm 0.02}{}  \\
+      0001 & 	\SI{-0.988 \pm 0.005}{} &         \SI{-1.000 \pm 0.010}{}  \\
 \hline
 \end{tabular}
 \end{center}
 
-Si riporta inoltre in Figura~\ref{fig:tensione_DAC} l'andamento della tensione in uscita dal DAC in funzione del numero dato dal contatore. Si osserva che essa ha pendenza negativa di \SI{111}{V}, come previsto dalla modalità invertente, e che al numero $15$ corrisponde un'uscita di \SI{-15}{V}, a conferma della copertura con la massima sensibilità dell'intero range a disposizione dell'amplificatore. Inoltre, la linearità dell'andamento è confermata dalla stima del chi-quadro $111$, contro un numero di gradi di libertà di $14$.
+I dati sperimentali risultano dunque in buon accordo con le aspettative teoriche, confermando il buon funzionamento del circuito costruito.
 
-%\begin{Figure}
-%	\begin{center}
-%	\includegraphics[width=\linewidth]{}
-%	\captionof{figure}{Tensione in uscita al DAC in funzione del numero in ingresso}
-%	\label{fig:tensione_DAC}
-%	\end{center}
-%\end{Figure}
+Si collegano quindi agli ingressi del DAC le uscite del contatore realizzato nella Sezione~\ref{sec:counter}; quindi si fornisce al contatore un clock mediante un'onda quadra TTL di frequenza \SI{595 \pm 17}{Hz}. Si riporta in Figura~\ref{fig:verifica_tensione_dac} un'istantanea dell'oscilloscopio per questa configurazione: al canale \texttt{CH1} vi è l'onda quadra di clock, mentre al \texttt{CH2} l'uscita del DAC. Si osserva come essa sia decrescente, in quanto l'amplificatore è invertente, e presenti un andamento della tensione \emph{a gradini}. In Figura~\ref{fig:verifica_tensione_dac_2} viene inoltre riportata un'istantanea della stessa configurazione ma con una scala temporale tale da poter vedere l'andamento periodico dell'uscita del DAC. In entrambi i grafici si vede che il contatore commuta il suo valore in corrispondenza della discesa del segnale di clock, coerente con il funzionamento dei flip-flop di tipo \emph{edge triggered} che compongono il circuito integrato.
+
+\begin{Figure}
+	\begin{center}
+	\includegraphics[width=\linewidth]{scala3.png}
+	\captionof{figure}{Istantanea dell'oscilloscopio per la tensione di uscita del DAC, singolo periodo}
+	\label{fig:verifica_tensione_dac}
+	\end{center}
+\end{Figure}
+
+\begin{Figure}
+	\begin{center}
+	\includegraphics[width=\linewidth]{scala2.png}
+	\captionof{figure}{Istantanea dell'oscilloscopio per la tensione di uscita del DAC, si vede l'andamento periodico}
+	\label{fig:verifica_tensione_dac_2}
+	\end{center}
+\end{Figure}
+
+
+Per misurare l'altezza di tali \emph{gradini}, non potendo impostare manualmente il clock per le ragioni suddette, si utilizzano i cursori dell'oscilloscopio. Si riportano in Tabella~\ref{tab:verifica_dac+contatore} i punti sperimentali trovati, e la stima dell'altezza di ciascun gradino come differenza del valore misurato con quello precedente.
+
+\begin{center}
+\captionof{table}{Misure sul DAC collegato al contatore}
+\label{tab:verifica_dac+contatore}
+\begin{tabular}{c|c|c}
+Contatore & $V_\text{out}$ [\SI{}{V}] & $\Delta V_\text{out}$ [\SI{}{mV}] \\
+\hline
+   0 &           -0.56 &                       0 \\
+   1 &           -1.36 &                    -800 \\
+   2 &           -2.16 &                    -800 \\
+   3 &           -2.92 &                    -760 \\
+   4 &           -3.74 &                    -820 \\
+   5 &           -4.52 &                    -780 \\
+   6 &           -5.32 &                    -800 \\
+   7 &           -6.16 &                    -840 \\
+   8 &           -7.32 &                   -1160 \\
+   9 &           -8.12 &                    -800 \\
+  10 &           -8.88 &                    -760 \\
+  11 &           -9.64 &                    -760 \\
+  12 &          -10.50 &                    -860 \\
+  13 &          -11.20 &                    -700 \\
+  14 &          -12.10 &                    -900 \\
+\hline
+\end{tabular}
+\end{center}
+Il valore medio del gradino è pari a $\overline{\Delta V_\text{out}} = \SI{-0.77 \pm 0.23}{\volt}$, compatibile con il valore teorico pari a 
+\[
+\Delta V_\text{out}^\text{teo} = \frac{\overline{V_\text{in}}}{8} \frac{R'}{R} = \SI{-0.65}{\volt}.
+\]
+
+Si riporta inoltre in Figura~\ref{fig:tensione_DAC} l'andamento della tensione in uscita dal DAC in funzione del numero dato dal contatore. Si osserva che essa ha pendenza negativa di \SI{0.832 \pm 0.006}{V}, come previsto dalla modalità invertente, diversa da 1 in quanto il gradino non è unitario. Inoltre, la linearità dell'andamento è confermata dalla stima del chi-quadro pari a $11.47$, contro un numero di gradi di libertà di $14$.
+
+\begin{Figure}
+	\begin{center}
+	\includegraphics[width=\linewidth]{vout.pdf}
+	\captionof{figure}{Tensione in uscita al DAC in funzione del numero in ingresso}
+	\label{fig:tensione_DAC}
+	\end{center}
+\end{Figure}
 
 %==================================================
 %             COMPARATORE ANALOGICO
@@ -254,14 +301,18 @@ Si realizza un comparatore analogico utilizzando un amplificatore operazionale L
 ;\end{circuitikz}
 \end{center}
 
-La tensione $V_x$ viene dunque prelevata da quella a \SI{-15}{V} fornita dal generatore mediante un trimmer, di resistenze $R_1$, $R_2$ variate mediante un cacciavite:
+La tensione $V_x$ viene dunque prelevata da quella a \SI{-15}{V} fornita dal generatore mediante un trimmer di resistenze $R_2$ variata mediante un cacciavite:
 \[
-V_x = \SI{-15}{V} \frac{R_2}{R_1 + R_2}.
+V_x = -15 \frac{R_2}{R_1 + R_2}.
 \]
 
-%la R 9.9 kOhm e il trimmer è a 5 kOhm
+Si sceglie come resistenza $R_1 = \SI{9.92 \pm 0.04}{\kilo\ohm}$ e come trimmer $R_2$ uno di valore massimo \SI{5}{\kilo\ohm}, in questo modo la tensione massima in ingresso al comparatore è pari a 
+\[
+V_x^\text{max} = -15 \frac{5}{15} = \SI{-5}{\volt},
+\]
+dunque si sceglie una resistenza $R'$ sul DAC pari a \SI{0.788 \pm 0.004}{\ohm} in modo da avere la massima risoluzione disponibile, in accordo con (\ref{eq:R'}). Tale valore di $R'$ non sarà più cambiato per il resto dell'esperienza.
 
-Il trimmer complessivamente prevede una resistenza $R_1 + R_2 = \SI{111}{\kilo\ohm}$.
+%la R 9.9 kOhm e il trimmer è a 5 kOhm
 
 Il funzionamento del comparatore prevede che fintanto che la tensione in uscita dal DAC è maggiore di $V_x$ il contatore continui ad incrementare il conteggio; non appena la tensione in uscita dal DAC diventa minore di $V_x$, il contatore blocca il conteggio, mediante un altro circuito di stop che sarà analizzato nel seguito. È evidente che la massima tensione comparabile, e dunque convertibile in digitale, $V_x$ è proprio pari alla massima tensione d'uscita del DAC.
 
@@ -286,8 +337,8 @@ Si realizza mediante le porte NAND dell'integrato 74LS00 e un diodo 1N4148 l'ada
 I resistori hanno valori, misurati con il multimetro, di
 
 \begin{itemize} %Lo spazio verticale è stato tolto con \setlist{noitemsep} nell'header, rimuovere quella riga per avere una lista classica
-	\item[--] $R_1 = \SI{1.0045 \pm 111}{\kilo\ohm}$;
-	\item[--] $R_2 = \SI{468.7 \pm 111}{\ohm}$,
+	\item[--] $R_1 = \SI{1.0045 \pm 0.005}{\kilo\ohm}$;
+	\item[--] $R_2 = \SI{468 \pm 23}{\ohm}$,
 \end{itemize}
 e costituiscono un partitore che riporta a \SI{5}{V} l'ingresso della porta NAND. Il diodo è inserito in modo da portarsi in conduzione quando l'uscita del comparatore commuta a \SI{-15}{V}: in tale caso, il potenziale del catodo diventa di \SI{-0.2}{V}, ossia 0 logico, perciò tramite le porte NAND, l'ingresso di clock del contatore si porterà anch'esso a 0 logico, bloccando il conteggio al numero corrispondente alla conversione digitale discreta della tensione analogica continua $V_x$. 
 
@@ -297,37 +348,52 @@ e costituiscono un partitore che riporta a \SI{5}{V} l'ingresso della porta NAND
 \section{Circuito completo}
 Si completa il circuito unendo le diverse componenti realizzate nelle sezioni precedenti. 
 
-Scegliamo $R' = 0.788 kOhm$.
+Si connette quindi l'ingresso di \texttt{CLOCK} dell'adattatore TTL ad un segnale di onda quadra prelevato dall'uscita TTL del generatore di segnali, con frequenza nell'ordine dei \SI{}{\kilo\hertz}. Si azzera manualmente il contatore e si imposta un valore di tensione $V_x$ ($\SI{-5}{V}<V_x<\SI{0}{V}$) agendo sul trimmer del partitore; si pone l'interruttore di reset nuovamente a massa, in modo da permettere il funzionamento del contatore, e si legge il numero corrispondente al valore digitale della tensione mediante i LED.
 
-Si connette quindi l'ingresso di \texttt{CLOCK} dell'adattatore TTL ad un segnale di onda quadra prelevato dall'uscita TTL del generatore di segnali, con frequenza \SI{111}{Hz}. Si azzera manualmente il contatore e si imposta un valore di tensione $V_x$ ($\SI{-5}{V}<V_x<\SI{0}{V}$) agendo sul trimmer del partitore; si pone l'interruttore di reset nuovamente a massa, in modo da permettere il funzionamento del contatore, e si legge il numero corrispondente al valore digitale della tensione mediante i LED.
-
-Variando i valori delle resistenze del partitore, si può inviare in ingresso una tensione $V_x$ differente: si riportano dunque in Tabella~\ref{tab:calibrazioneADC} i valori di $V_x$ e le relative uscite digitali. Si riporta nel grafico di Figura~\ref{fig:calibrazioneADC} l'andamento dell'uscita digitale in funzione dell'ingresso di tensione analogica $V_x$. Si osserva la linearità dei dati sperimentali, dai quali, mediante interpolazione, si ricava una pendenza di \SI{111}{V^{-1}} e un'intercetta \SI{111}{}. Il chi-quadro di $111$, prossimo al valore atteso di $14$, conferma la bontà del fit.
+Variando i valori della resistenza del partitore, si può inviare in ingresso una tensione $V_x$ differente: si riportano dunque in Tabella~\ref{tab:calibrazioneADC} i valori di $V_x$, le relative uscite digitali (indicate in base 10), le corrispondenti tensioni in uscita del DAC e i valori teorici di confronto. Si riporta nel grafico di Figura~\ref{fig:calibrazioneADC} l'andamento dell'uscita digitale in funzione dell'ingresso di tensione analogica $V_x$. Si osserva la linearità dei dati sperimentali.
 
 \begin{table*}
 \captionof{table}{Misure per la calibrazione dell'ADC}
 \label{tab:calibrazioneADC}
 \begin{center}
 \begin{tabular}{c|c|c|c}
-$R_1$ [\SI{}{\kilo\ohm}] & $R_2$ [\SI{}{\kilo\ohm}] & $V_x$ [\SI{}{V}] & Contatore \\
 \hline
+   n &   $V_{x}$ [V] &   $V_{o}$ [V] &   $V_{o,teo}$ [V] \\
+\hline
+   0 &        0.000 &        -0.239 &            0.000 \\
+   1 &        -0.300 &        -0.530 &            -0.318 \\
+   2 &        -0.603 &        -0.823 &            -0.637 \\
+   3 &        -0.845 &        -1.120 &            -0.955 \\
+   4 &        -1.146 &        -1.400 &            -1.274 \\
+   5 &        -1.420 &        -1.700 &            -1.592 \\
+   6 &        -1.730 &        -1.990 &            -1.911 \\
+   7 &        -1.990 &        -2.290 &            -2.229 \\
+   8 &        -2.300 &        -2.700 &            -2.548 \\
+   9 &        -2.730 &        -2.980 &            -2.866 \\
+  10 &        -2.990 &        -3.270 &            -3.185 \\
+  11 &        -3.280 &        -3.560 &            -3.503 \\
+  12 &        -3.570 &        -3.850 &            -3.822 \\
+  13 &        -3.850 &        -4.140 &            -4.140 \\
+  14 &        -4.130 &        -4.430 &            -4.458 \\
+  15 &        -4.440 &        -4.720 &            -4.777 \\
 \hline
 \end{tabular}
 \end{center}
 \end{table*}
 
-%\begin{Figure}
-%	\begin{center}
-%	\includegraphics[width=\linewidth]{}
-%	\captionof{figure}{Uscita digitale in funzione del valore di tensione analogica $V_x$}
-%	\label{fig:calibrazioneADC}
-%	\end{center}
-%\end{Figure}
+\begin{Figure}
+	\begin{center}
+	\includegraphics[width=\linewidth]{end.pdf}
+	\captionof{figure}{Uscita digitale in funzione del valore di tensione analogica $V_x$}
+	\label{fig:calibrazioneADC}
+	\end{center}
+\end{Figure}
 
-
+Si osserva che, in molti casi, il valore di tensione sul DAC corrisponde al valore di $V_X$ misurato al bit precedente, ciò è dovuto alla strategia di misura fatta e alla discretizzazione delle tensioni in uscita dal DAC: il trimmer veniva fatto ruotare fino ad osservare il bit successivo sui LED, quindi la tensione $V_x$ da misurare è stata presa come il valore minimo necessario a far \emph{scattare} il contatore al gradino corrispondente alla tensione appena superiore, di conseguenza la differenza tra il valore di tensione $V_o$ e il valore $V_x$ corrisponde sempre a circa l'ampiezza di un gradino. 
 
 \end{multicols}
-\newpage
-\section{Appendice}
+%\newpage
+%\section{Appendice}
 
 
 %ESEMPIO DI FIGURA
